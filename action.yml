@@ -1,0 +1,28 @@
+name: "QTBUG-88688-libxcb-util"
+description: "Symlink libxcb-util.so.0 as libxcb-util.so.1 to work around QTBUG-88688"
+runs:
+  using: "composite"
+  steps:
+    - shell: python
+      run: |
+      import pathlib
+      import subprocess
+
+
+      completed_process = subprocess.run(
+          ['ldconfig', '-p'],
+          check=True,
+          stdout=subprocess.PIPE,
+      )
+
+      print(completed_process.stdout)
+
+      [xcb_util_line] = [
+          line
+          for line in completed_process.stdout.decode('utf-8').splitlines()
+          if 'libxcb-util' in line
+      ]
+
+      existing = pathlib.Path(xcb_util_line.split('=>')[1].strip())
+      new = existing.with_suffix('.1')
+      new.symlink_to(existing)
