@@ -7,7 +7,11 @@ runs:
       run: |
         import pathlib
         import subprocess
-
+        import sys
+        
+        
+        if sys.platform != 'linux':
+            sys.exit(0)
 
         completed_process = subprocess.run(
             ['ldconfig', '-p'],
